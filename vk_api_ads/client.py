@@ -1,15 +1,20 @@
 import json
-from time import sleep
 from requests import request as http_request
 from vk_api_ads.exceptions import VKAdsClientError, VKAdsApiError
 
 
 class VKAds:
     def __init__(self, access_token: str, **kwargs):
+        """
+        Клиент для взаимодействия с рекламным API VK.
+        :param access_token: Ключ доступа (https://dev.vk.com/ru/api/access-token/getting-started).
+        :param kwargs: Необязательные параметры для настройки клиента:
+                       * server_address - адрес сервера API. По умолчанию api.vk.com.
+                       * api_version - используемая версия API. По умолчанию 5.131.
+        """
         self.__access_token = access_token
         self._api_endpoint = f'https://{kwargs.get("server_address", "api.vk.com")}/method'
         self._api_version = kwargs.get('api_version', '5.131')
-        self._request_latency = kwargs.get('request_latency', 10)  # Базовая задержка между запросами API
 
     def _make_request(self, api_method: str, headers: dict, params: dict):
         """
@@ -19,33 +24,22 @@ class VKAds:
         :param params: Параметры запроса.
         :return:
         """
-        # Параметры для регулирования скорости выполнения повторных запросов.
-        retry_count = 0
         # Параметры для запроса к API
         api_url = '/'.join([self._api_endpoint, api_method])
         headers.update({'Authorization': f'Bearer {self.__access_token}'})
         params.update({'v': self._api_version})
 
-        while True:
-            try:
-                response = http_request('GET', url=api_url, headers=headers, params=params)
-                # Принудительная обработка ответа в кодировке UTF-8
-                response.encoding = 'utf-8'
+        try:
+            response = http_request('GET', url=api_url, headers=headers, params=params)
+            # Принудительная обработка ответа в кодировке UTF-8
+            response.encoding = 'utf-8'
 
-                if response.status_code == 200:
-                    return response
-                elif response.status_code in (201, 202):
-                    # Увеличение задержки с каждой неудачной попыткой
-                    retry_count += 1
-                    latency_time = self._request_latency * 2 ** retry_count
-                    sleep(latency_time)
-                    if latency_time >= 600:
-                        # Сбрасываем счётчик, если время ожидания больше 10 минут
-                        retry_count = 0
-                else:
-                    raise VKAdsApiError(response.status_code, response.json())
-            except ConnectionError:
-                raise VKAdsClientError(ConnectionError)
+            if response.status_code == 200:
+                return response
+            else:
+                raise VKAdsApiError(response.status_code, response.json())
+        except ConnectionError:
+            raise VKAdsClientError(ConnectionError)
 
     def get_statistics(self, account_id: int, ids_type: str, ids: list, period: str, **kwargs):
         """

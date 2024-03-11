@@ -8,10 +8,20 @@ from vk_api_ads.exceptions import VKAppClientError, VKAppApiError
 
 class VKApp:
     def __init__(self, app_id: int, service_token: str):
+        """
+        Клиент для взаимодействия с приложением VK.
+        :param app_id: Идентификатор приложения.
+        :param service_token: Сервисный токен приложения.
+        """
         self._app_id = app_id
         self.__service_token = service_token
 
     def get_silent_token(self, redirect_uri: str):
+        """
+        Генерирует токен (Silent token) для предварительного получения данных пользователя.
+        :param redirect_uri: Адрес, на который будет передан токен.
+        :return:
+        """
         params = {
             'uuid': uuid4(),
             'app_id': self._app_id,
@@ -22,6 +32,12 @@ class VKApp:
         webbrowser.open(url=url, new=2)
 
     def get_access_token(self, redirected_url: str, api_version: str = '5.131'):
+        """
+        Генерирует токен (Access token) для вызова методов API.
+        :param redirected_url: Ссылка, которая содержит (Silent token)
+        :param api_version:  Используемая версия API. По умолчанию 5.131.
+        :return:
+        """
         try:
             # Разбор URL для извлечения параметров
             parsed_url = urlparse(redirected_url)
