@@ -35,9 +35,15 @@ class VKAds:
             response.encoding = 'utf-8'
 
             if response.status_code == 200:
-                return response
+                if error_obj := response.json().get('error', None):
+                    error_code = error_obj['error_code']
+                    error_msg = error_obj['error_msg']
+                    request_params = error_obj['request_params']
+                    raise VKAdsApiError(error_code, error_msg, request_params)
+                else:
+                    return response
             else:
-                raise VKAdsApiError(response.status_code, response.json())
+                raise VKAdsApiError(response.status_code, response.text, response.request.url)
         except ConnectionError:
             raise VKAdsClientError(ConnectionError)
 
