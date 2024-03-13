@@ -4,7 +4,8 @@ from vk_api_ads.constants import IDType, StatisticsPeriod
 from vk_api_ads.schemas import (CampaignSchema,
                                 AdSchema,
                                 AdLayoutSchema,
-                                StatisticSchema)
+                                StatisticSchema,
+                                StatisticItemSchema)
 
 __all__ = [
     # Клиенты
@@ -18,4 +19,5 @@ __all__ = [
     'AdSchema',
     'AdLayoutSchema',
     'StatisticSchema',
+    'StatisticItemSchema',
 ]

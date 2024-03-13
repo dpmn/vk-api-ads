@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
+from datetime import date
 
 
 class __BaseSchema(BaseModel):
@@ -19,7 +20,7 @@ class StatisticItemSchema(BaseModel):
     """
     Структура поля stats в модели StatisticSchema.
     """
-    day: Optional[str] = Field(default=None, description='День в формате YYYY-MM-DD.')
+    day: Optional[date] = Field(default=None, description='День в формате YYYY-MM-DD.')
     month: Optional[str] = Field(default=None, description='Месяц в формате YYYY-MM.')
     overall: Optional[int] = Field(default=None, description='1, если период равен overall.')
     spent: Optional[float] = Field(default=0.0, description='Потраченные средства.')
