@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from datetime import date
 
@@ -186,6 +186,18 @@ class AdSchema(__BaseSchema):
         default=None,
         description='Группы ретаргетинга.'
     )
+
+    @field_validator('ad_platform', mode='before')
+    def transform_ad_platform(cls, v):
+        """
+        В зависимости от формата рекламы, API может отдавать в то поле как числовые, так и строковые значения.
+        Валидатор приводит все значения к строке.
+        :param v: Значение параметра.
+        :return:
+        """
+        if isinstance(v, int):
+            return str(v)
+        return v
 
 
 class AdLayoutSchema(__BaseSchema):

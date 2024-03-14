@@ -47,7 +47,7 @@ class VKAds:
         except ConnectionError:
             raise VKAdsClientError(ConnectionError)
 
-    def get_statistics(self, account_id: int, ids_type: str, ids: list, period: str, **kwargs):
+    def get_statistics(self, account_id: int, ids_type: str, ids: list[str | int], period: str, **kwargs):
         """
         Возвращает статистику показателей эффективности по рекламным объявлениям, кампаниям, клиентам или всему
         кабинету.
@@ -64,7 +64,7 @@ class VKAds:
         params = {
             'account_id': account_id,
             'ids_type': ids_type,
-            'ids': ','.join(ids),
+            'ids': ','.join(map(str, ids)),
             'period': period,
             'date_from': kwargs.get('date_from', '0'),
             'date_to': kwargs.get('date_to', '0')
